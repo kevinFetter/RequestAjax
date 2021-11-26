@@ -28,7 +28,11 @@ class AuthController extends Controller
         //validar se o Email é válido
         if(!filter_var($request->email, FILTER_VALIDATE_EMAIL))
         {
-            return redirect()->back()->withInput()->withErrors(['E-mail inválido !']);
+            $login['success'] = false;
+            $login['message'] = ' O email informado não é valido';
+             echo json_encode($login);
+             return;
+            //return redirect()->back()->withInput()->withErrors(['E-mail inválido !']);
         }
 
         $credentials = [
@@ -37,13 +41,21 @@ class AuthController extends Controller
         ];
         //vai fazer uma tentativa de login com array associativa
         if(Auth::attempt($credentials)){
-            return redirect()->route('admin');    
+            //return redirect()->route('admin');    
+            $login['success'] = true;
+            //$login['Usuário autenticado'];
+            echo json_encode($login);
+            return;
         };
         //valida se tiver erro
         //withInput faz persistir os dados e o withErros valida se tem erro e informa mensagem
-        return redirect()->back()->withInput()->withErrors(['Dados informados não confererem!']);
+        //return redirect()->back()->withInput()->withErrors(['Dados informados não confererem!']);
+        $login['success'] = false;
+        $login['message'] = 'Dados informado estão errado ! ';
+         echo json_encode($login);
+         return;
     }
-
+        
     public function logout()
     {
         Auth::logout();

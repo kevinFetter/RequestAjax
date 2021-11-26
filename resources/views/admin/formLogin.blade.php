@@ -183,23 +183,22 @@ button,  .botao-enviar:hover { color: black !important;}
 <body>
     <div class="login-box">
         <h2>Login - Modular</h2>
-        @if($errors->all())
+        {{-- @if($errors->all())
         {{-- Coletivo de mensagens de erro --}}
-          @foreach($errors->all() as $error)
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{$error}}
+          {{-- @foreach($errors->all() as $error)  --}}
+          <div class="alert alert-danger alert-dismissible fade show d-none messageBox" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
-          @endforeach
-        @endif
-        <form action="{{ route('admin.login.do')}}" method="post">
+          {{-- @endforeach
+        @endif --}}
+        <form name="formLogin">
             @csrf
           <div class="user-box">
-            <input type="text" name="email" value="teste@teste.com" required="">
+            <input type="text" name="email" id="email" value="teste@teste.com" required="">
             <label>Email</label>
           </div>
           <div class="user-box">
-            <input type="password" name="password" required="">
+            <input type="password" name="password" id="password" required="">
             <label>Senha</label>
           </div>
           <a href="#" class="botao-enviar">
@@ -211,7 +210,37 @@ button,  .botao-enviar:hover { color: black !important;}
           </a>
         </form>
       </div>
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js"></script>
+      <script>
+        $(function(){
+            // seletor 'form' definido no name do form
+            //encapsular o form pegando o evento do submit 
+            $('form[name="formLogin"]').submit(function(event){
+              event.preventDefault();//para que ele tenha um comportamento padrão, impede de atualizar  a página
+              //var email = $(this).find('input#email').val();//estou pedindo para procurar dentro do elemento e passar o id pelo #
+              //alert('Funcionou o encapsulamento do form: ' + email);
+                $.ajax({
+                  url: "{{ route('admin.login.do') }}",
+                  type: "post",
+                  data: $(this).serialize(),
+                  dataType: 'json', 
+                  success: function(response){
+                    if(response.success === true) {
+                      // route é um helper
+                      window.location.href = "{{ route('admin') }}";
+                        //redirecionar
+                    }else {
+                      //Se tiver uma mensagem de erro, eu preciso remover essa classe
+                      $('.messageBox').removeClass('d-none ').html(response.message);
+                    }
+                    console.log(response); 
+                  }
+                });
+            });
+        });
+      </script>
 </body>
 </html>
